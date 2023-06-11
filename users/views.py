@@ -37,6 +37,8 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     
+    def destroy(self, request, *args, **kwargs):
+        return Response({},status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @action(detail=False, methods=['post'])
     def login(self, request, *args, **kwargs):

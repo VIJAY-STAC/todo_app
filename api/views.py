@@ -1,7 +1,9 @@
 import datetime
 from django.shortcuts import render
-from .models import Task
-from .serializers import TaskSerializer
+
+
+from .models import Task, TaskLabels
+from .serializers import TaskLabelsSerializer, TaskSerializer
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -69,6 +71,46 @@ class TaskViewSet(viewsets.ModelViewSet):
         return Response({"Task deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
     
     @action(detail=False, methods=['get'])
-    def coding(self, request, *args, **kwargs):
-        time = datetime.datetime.now()
-        return Response({"data": time}, status=status.HTTP_200_OK)
+    def tasklabels(self, request, *args, **kwargs):
+        tasklabels = Task.objects.all().values_list('task_label').distinct()
+        return Response(tasklabels, status=status.HTTP_200_OK)
+
+
+class TaskLabelsViewset(viewsets.ModelViewSet):
+    model = TaskLabels
+    serializer_class = TaskLabelsSerializer
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (JWTAuthentication,)
+
+    def get_queryset(self):
+        queryset = TaskLabels.objects.all()
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        serializer = TaskLabelsSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(created_by=request.user)
+            return Response(serializer.data,status=status.HTTP_200_OK)
+       
+
+    def list(self, request, *args, **kwargs):
+        tasklabels = TaskLabels.objects.all()
+        serializer = TaskLabelsSerializer(tasklabels, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def update(self, request, *args, **kwargs):
+        id = kwargs['pk']
+        try:
+            tasktype =  TaskLabels.objects.get(id=id)
+            print()
+        except:
+            return Response({"error":"Task type of does not accept."},status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = TaskLabelsSerializer(tasktype, data=request.data)
+        serializer.is_valid(serializer)
+        tasklable = serializer.save(last_modified_by=request.user)
+        serializer = TaskLabelsSerializer(tasklable)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def destroy(self, request, *args, **kwargs):
+        return Response({},status=status.HTTP_405_METHOD_NOT_ALLOWED)

@@ -138,7 +138,9 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOWED_ORIGINS = [
    
-   "http://localhost:4200" 
+   "http://localhost:4200" ,
+    'http://localhost:3000', 
+     # Add the URL 
 ]
 
 
@@ -168,6 +170,6 @@ REST_FRAMEWORK = {
 
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # Set the desired expiration time
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=600),  # Set the desired expiration time
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
