@@ -48,17 +48,19 @@ class UserViewSet(viewsets.ModelViewSet):
             try:
                 user = User.objects.get(email=email)
             except User.DoesNotExist:
-                return Response({"error": f"Invalid email."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": f"Invalid email.", "stat": False}, status=status.HTTP_400_BAD_REQUEST)
 
             if not user.check_password(password):
-                return Response("incorrect_credentials", status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": "incorrect_credentials","stat": False}, status=status.HTTP_400_BAD_REQUEST)
 
             refresh = RefreshToken.for_user(user)
 
             user_details = {
                 'id': user.id,
                 'name': f"{user.first_name} {user.last_name}",
-                'access_token': str(refresh.access_token)
+                'access_token': str(refresh.access_token),
+                'stat': True,
+	            'message': "Login successful"
                 
             }
 
